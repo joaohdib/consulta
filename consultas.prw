@@ -79,12 +79,13 @@ RETURN
 
 Static Function insert()
 	Local oJanela  := TDialog():New(0, 0, 730, 1100, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
+	Local aFornecedores := getFornecedores()
 	Local aValores := { ;
 		{'', 'Filial'}, ;
 		{'', 'Ficha Médica'}, ;
 		{'', 'Codigo do Exame'}, ;
 		{Date(), 'Data do Exame'}, ;
-		{'', 'Municipio'}, ;
+		{'', 'Fornecedor'}, ;
 		{'', 'Endereço'}, ;
 		{'', 'Nome Fantasia'}, ;
 		{'', 'Tipo'} ;
@@ -92,19 +93,14 @@ Static Function insert()
 
 
 	oFilial        := TGet():New( 000, 001, {|u|if(PCount()==0,aValores[1][1],aValores[1][1]:=u)}, oJanela, 096, 009,"@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[1][1],,,,,,,aValores[1][2],1,,,,.T.,)
-
+	
 	oFichaM		   := TGet():New( 000, 100, {|u|if(PCount()==0,aValores[2][1],aValores[2][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[2][1],,,,,,,aValores[2][2],1,,,,.T.,)
 
 	oCodEx         := TGet():New( 020, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
 
-	oData	       := TGet():New( 020, 100, {|u| if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
+	oData	       := TGet():New( 020, 100, {|u|if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
 
-	//oNFantasia    := TGet():New( 040, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oTFolder:aDialogs[1], 096, 009, "@E XXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
-
-	//oTelefone     := TGet():New( 040, 100, {|u|if(PCount()==0,aValoresN[3][1],aValoresN[3][1]:=u)}, oTFolder:aDialogs[1], 096, 009, "@R 9999-9999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValoresN[3][1],,,,,,,aValoresN[3][2],1,,,,.T.,)
-
-	//OPFisica 	  := TGet():New( 060, 100, {|u|if(PCount()==0,aValoresN[4][1],aValoresN[4][1]:=u)}, oTFolder:aDialogs[1], 096, 009, "@E XXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValoresN[4][1],,,,,,,aValoresN[4][2],1,,,,.T.,)
-
+	oFornecedores  := TComboBox():New( 040, 001, {|u|if(PCount()>0,aValores[5][1]:=u,aValores[5][1])}, aFornecedores, 100, , oJanela, , , , , , .T., ,, , , , , , , aValores[5][1], aValores[5][2], 1, , )
 
 	/////////////////////// BOTÃO 'Inserir' ///////////////////////
 
@@ -157,7 +153,7 @@ Static Function update()
 	oCodEx         := TGet():New( 020, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
 
 	oData	       := TGet():New( 020, 100, {|u| if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
-	
+
 
 
 	oButton3   := TButton():Create(oJanela,340,1,"Atualizar",{||updateDb(TM5->(RecNo()),aValores, oJanela)},75,20,,,,.T.,,,,,,)
@@ -249,7 +245,7 @@ Static Function view()
 	oData	       := TGet():New( 020, 100, {|u| if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
 
 
-	
+
 	oButton3      := TButton():Create(oJanela, 340,1,"Fechar",{||oJanela:end()},75,20,,,,.T.,,,,,,)
 	// ATIVANDO JANELA
 	oJanela:Activate(,,,.T.,,,)
@@ -272,7 +268,7 @@ Static Function PRINTGRAPH()
 	TRCell():New(oSection, "TM5_NUMFIC", "TM5", "Num Ficha Medica" , /*Picture*/, /*Tamanho*/, /*lPixel*/, /*{|| code-block de impressao }*/)
 	TRCell():New(oSection, "TM5_EXAME" , "TM5", "Codigo do Exame Medico"    , , /*Tamanho*/,  , /*{|| code-block de impressao }*/)
 	TRCell():New(oSection, "TM5_DTPROG" , "TM5", "Data do Exame"    , , /*Tamanho*/,  , /*{|| code-block de impressao }*/)
-	
+
 	oReport:PrintDialog()
 
 Return
@@ -300,3 +296,17 @@ Static Function ReportPrint(oReport, oSection)
 	#ENDIF
 
 return
+
+Static Function getFornecedores()
+	Local aCodigos := {}
+	Local cQuery
+	Local nI
+
+	cQuery := "SELECT A2_COD FROM "+ RetSqlName("SA2") + " WHERE D_E_L_E_T_ LIKE ' '"
+	TCSqlToArr( cQuery, aCodigos, , ,)
+
+	For nI := 1 To len(aCodigos)
+		aCodigos[nI] := aCodigos[nI][1]
+	Next
+
+RETURN aCodigos
