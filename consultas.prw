@@ -80,27 +80,40 @@ RETURN
 Static Function insert()
 	Local oJanela  := TDialog():New(0, 0, 730, 1100, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
 	Local aFornecedores := getFornecedores()
+	Local aOrigem := {"1","2"}
 	Local aValores := { ;
 		{'', 'Filial'}, ;
 		{'', 'Ficha Médica'}, ;
 		{'', 'Codigo do Exame'}, ;
 		{Date(), 'Data do Exame'}, ;
 		{'', 'Fornecedor'}, ;
-		{'', 'Endereço'}, ;
-		{'', 'Nome Fantasia'}, ;
-		{'', 'Tipo'} ;
+		{'', 'Loja Fornec.'}, ;
+		{'', 'Filial Func.'}, ;
+		{'', 'Matricula do Func.'}, ;
+		{'', 'Origem Exame'}, ;
+		{'', 'Numero do PCMSO'};
 		}
 
 
 	oFilial        := TGet():New( 000, 001, {|u|if(PCount()==0,aValores[1][1],aValores[1][1]:=u)}, oJanela, 096, 009,"@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[1][1],,,,,,,aValores[1][2],1,,,,.T.,)
-	
+
 	oFichaM		   := TGet():New( 000, 100, {|u|if(PCount()==0,aValores[2][1],aValores[2][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[2][1],,,,,,,aValores[2][2],1,,,,.T.,)
 
 	oCodEx         := TGet():New( 020, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
 
 	oData	       := TGet():New( 020, 100, {|u|if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
 
-	oFornecedores  := TComboBox():New( 040, 001, {|u|if(PCount()>0,aValores[5][1]:=u,aValores[5][1])}, aFornecedores, 100, , oJanela, , , , , , .T., ,, , , , , , , aValores[5][1], aValores[5][2], 1, , )
+	oFornecedores  := TComboBox():New( 040, 001, {|u|if(PCount()>0,aValores[5][1]:=u,aValores[5][1])}, aFornecedores, 100, , oJanela,,{||alteraLoja(@oFornecedores, @oLoja)},,,,.T.,,,,,,,,, aValores[5][1], aValores[5][2], 1, , )
+
+	oLoja	       := TGet():New( 040, 100, {|u|if(PCount()==0, aValores[6][1], aValores[6][1]:=u)}, oJanela, 096, 009, "@N 99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[6][2],1,,,,.T.,)
+
+	oFilFun	       := TGet():New( 060, 001, {|u|if(PCount()==0, aValores[7][1], aValores[7][1]:=u)}, oJanela, 096, 009, "@E XX", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[7][2],1,,,,.T.,)
+
+	oMat           := TGet():New( 060, 100, {|u|if(PCount()==0, aValores[8][1], aValores[8][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[8][2],1,,,,.T.,)
+
+	oOrigem        := TComboBox():New( 080, 001, {|u|if(PCount()>0,aValores[9][1]:=u,aValores[9][1])}, aOrigem, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[9][1], aValores[9][2], 1, , )
+
+	oPcmso         := TGet():New( 080, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
 
 	/////////////////////// BOTÃO 'Inserir' ///////////////////////
 
@@ -119,30 +132,39 @@ Static Function insertDb(aValores, oJanela)
 	RecLock("TM5", .T.)
 	TM5_FILIAL := aValores[1][1]
 	TM5_NUMFIC := aValores[2][1]
-	TM5_EXAME := aValores[3][1]
+	TM5_EXAME  := aValores[3][1]
 	TM5_DTPROG := aValores[4][1]
+	TM5_FORNEC := aValores[5][1]
+	TM5_LOJA   := aValores[6][1]
+	TM5_FILFUN := aValores[7][1]
+	TM5_MAT    := aValores[8][1]
+	TM5_ORIGEX := aValores[9][1]
+	TM5_PCMSO  := aValores[10][1]
 
 	MsUnlock()
 
 	TM5->(dbCloseArea())
 
-	FWAlertSuccess("Consulta inserida com sucesso", "Inserido")
+	FWAlertSuccess("Consulta inserida com sucesso", "Inserida")
 	oJanela:end()
 
 RETURN
 
 Static Function update()
 	Local oJanela  := TDialog():New(0, 0, 730, 1100, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
-
+	Local aFornecedores := getFornecedores()
+	Local aOrigem := {"1","2"}
 	Local aValores := { ;
 		{TM5->TM5_FILIAL, 'Filial'}, ;
 		{TM5->TM5_NUMFIC, 'Ficha Médica'}, ;
 		{TM5->TM5_EXAME, 'Codigo do Exame'}, ;
 		{TM5->TM5_DTPROG, 'Data do Exame'}, ;
-		{'', 'Municipio'}, ;
-		{'', 'Endereço'}, ;
-		{'', 'Nome Fantasia'}, ;
-		{'', 'Tipo'} ;
+		{TM5->TM5_FORNEC, 'Fornecedor'}, ;
+		{TM5->TM5_LOJA, 'Loja Fornec.'}, ;
+		{TM5->TM5_FILFUN, 'Filial Func.'}, ;
+		{TM5->TM5_MAT, 'Matricula do Func.'}, ;
+		{TM5->TM5_ORIGEX, 'Origem Exame'}, ;
+		{TM5->TM5_PCMSO, 'Numero do PCMSO'} ;
 		}
 
 
@@ -154,6 +176,18 @@ Static Function update()
 
 	oData	       := TGet():New( 020, 100, {|u| if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
 
+	oFornecedores  := TComboBox():New( 040, 001, {|u|if(PCount()>0,aValores[5][1]:=u,aValores[5][1])}, aFornecedores, 100, , oJanela,,{||alteraLoja(@oFornecedores, @oLoja)},,,,.T.,,,,,,,,, aValores[5][1], aValores[5][2], 1, , )
+	selecionaFornecedor(@oFornecedores, TM5->TM5_FORNEC)
+
+	oLoja	       := TGet():New( 040, 100, {|u|if(PCount()==0, aValores[6][1], aValores[6][1]:=u)}, oJanela, 096, 009, "@N 99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[6][2],1,,,,.T.,)
+
+	oFilFun	       := TGet():New( 060, 001, {|u|if(PCount()==0, aValores[7][1], aValores[7][1]:=u)}, oJanela, 096, 009, "@E XX", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[7][2],1,,,,.T.,)
+
+	oMat           := TGet():New( 060, 100, {|u|if(PCount()==0, aValores[8][1], aValores[8][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[8][2],1,,,,.T.,)
+
+	oOrigem        := TComboBox():New( 080, 001, {|u|if(PCount()>0,aValores[9][1]:=u,aValores[9][1])}, aOrigem, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[9][1], aValores[9][2], 1, , )
+
+	oPcmso         := TGet():New( 080, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
 
 
 	oButton3   := TButton():Create(oJanela,340,1,"Atualizar",{||updateDb(TM5->(RecNo()),aValores, oJanela)},75,20,,,,.T.,,,,,,)
@@ -171,7 +205,13 @@ Static Function updateDb(recno, aValores, oJanela)
 	cQryUpd += "SET tm5_filial = '" + aValores[1][1] + "', "
 	cQryUpd += "tm5_numfic = '" + aValores[2][1] + "', "
 	cQryUpd += "tm5_exame = '" + AllTrim(aValores[3][1]) + "', "
-	cQryUpd += "tm5_dtprog = '" + DtoS(aValores[4][1]) + "' "
+	cQryUpd += "tm5_dtprog = '" + DtoS(aValores[4][1]) + "', "
+	cQryUpd += "TM5_FORNEC = '" + aValores[5][1] + "', "
+	cQryUpd += "TM5_LOJA = '" + aValores[6][1] + "', "
+	cQryUpd += "TM5_FILFUN = '" + aValores[7][1] + "', "
+	cQryUpd += "TM5_MAT = '" + aValores[8][1] + "', "
+	cQryUpd += "TM5_ORIGEX = '" + aValores[9][1] + "', "
+	cQryUpd += "TM5_PCMSO = '" + aValores[10][1] + "' "
 	cQryUpd += "WHERE R_E_C_N_O_ = '" + cValToChar(recno) + "' "
 	cQryUpd += "AND D_E_L_E_T_ = ' '"
 
@@ -179,7 +219,7 @@ Static Function updateDb(recno, aValores, oJanela)
 
 	If nErro != 0
 		msgStop("Erro.")
-	Endif
+	Endif	
 
 
 	FWAlertSuccess("Atualizado com sucesso", "Atualizado")
@@ -230,10 +270,12 @@ Static Function view()
 		{TM5->TM5_NUMFIC, 'Ficha Médica'}, ;
 		{TM5->TM5_EXAME, 'Codigo do Exame'}, ;
 		{TM5->TM5_DTPROG, 'Data do Exame'}, ;
-		{'', 'Municipio'}, ;
-		{'', 'Endereço'}, ;
-		{'', 'Nome Fantasia'}, ;
-		{'', 'Tipo'} ;
+		{TM5->TM5_FORNEC, 'Fornecedor'}, ;
+		{TM5->TM5_LOJA, 'Loja Fornec.'}, ;
+		{TM5->TM5_FILFUN, 'Filial Func.'}, ;
+		{TM5->TM5_MAT, 'Matricula do Func.'}, ;
+		{TM5->TM5_ORIGEX, 'Origem Exame'}, ;
+		{TM5->TM5_PCMSO, 'Numero do PCMSO'} ;
 		}
 
 	oFilial        := TGet():New( 000, 001, {|u|if(PCount()==0,aValores[1][1],aValores[1][1]:=u)}, oJanela, 096, 009,"@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[1][1],,,,,,,aValores[1][2],1,,,,.T.,)
@@ -244,6 +286,17 @@ Static Function view()
 
 	oData	       := TGet():New( 020, 100, {|u| if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
 
+	oFornecedores  := TGet():New( 040, 001, {|u|if(PCount()==0,aValores[5][1],aValores[5][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[5][1],,,,,,,aValores[5][2],1,,,,.T.,)
+
+	oLoja	       := TGet():New( 040, 100, {|u|if(PCount()==0, aValores[6][1], aValores[6][1]:=u)}, oJanela, 096, 009, "@N 99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[6][2],1,,,,.T.,)
+
+	oFilFun	       := TGet():New( 060, 001, {|u|if(PCount()==0, aValores[7][1], aValores[7][1]:=u)}, oJanela, 096, 009, "@E XX", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[7][2],1,,,,.T.,)
+
+	oMat           := TGet():New( 060, 100, {|u|if(PCount()==0, aValores[8][1], aValores[8][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[8][2],1,,,,.T.,)
+
+	oOrigem        := TGet():New( 080, 001, {|u|if(PCount()==0, aValores[9][1], aValores[9][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[9][2],1,,,,.T.,)
+
+	oPcmso         := TGet():New( 080, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
 
 
 	oButton3      := TButton():Create(oJanela, 340,1,"Fechar",{||oJanela:end()},75,20,,,,.T.,,,,,,)
@@ -310,3 +363,40 @@ Static Function getFornecedores()
 	Next
 
 RETURN aCodigos
+
+Static Function selecionaFornecedor(oFornecedores, cCod)
+
+	Local nI
+	Local aFornecedores 
+
+	aFornecedores := oFornecedores:aItems
+
+	For nI := 1 To Len(aFornecedores)
+
+		If aFornecedores[nI] == cCod
+			oFornecedores:Select(nI)
+			RETURN
+		Endif
+	Next
+
+RETURN
+
+Static Function alteraLoja(oFornecedor, oLoja)
+
+	Local cQuery
+	Local nI
+	Local aLojas := {}
+	Local cCod
+	cCod := oFornecedor:aItems[oFornecedor:nAt]
+	oLoja:cText := cCod
+
+	cQuery := "SELECT A2_LOJA FROM "+ RetSqlName("SA2") + " WHERE A2_COD LIKE '"+ cCod + "'"
+	TCSqlToArr( cQuery, aLojas, , ,)
+
+	For nI := 1 To len(aLojas)
+		aLojas[nI] := aLojas[nI][1]
+	Next
+
+	oLoja:cText := aLojas[1]
+
+RETURN
