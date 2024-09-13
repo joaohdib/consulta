@@ -47,7 +47,7 @@ User Function consultas()
 
 	oBrowse := MsSelBr():New( 5,5,570,315,,,,oMsDialog,,,,,,,,,,,,.F.,'TM5',.T.,,.F.,,, )
 
-	oBrowse:AddColumn(TCColumn():New('Nome Paciente',{||/* verificaPaciente() */},,,,'LEFT',,.F.,.F.,,,,.F.,))
+	oBrowse:AddColumn(TCColumn():New('Código do Médico',{||TM5->TM5_USUARI},,,,'LEFT',,.F.,.F.,,,,.F.,))
 	oBrowse:AddColumn(TCColumn():New('Data'  ,{||TM5->TM5_DTPROG},,,,'LEFT',,.F.,.F.,,,,.F.,))
 	oBrowse:AddColumn(TCColumn():New('Numero Ficha'  ,{||TM5->TM5_NUMFIC},,,,'LEFT',,.F.,.F.,,,,.F.,))
 	oBrowse:AddColumn(TCColumn():New('Codigo Exame'  ,{||TM5->TM5_EXAME},,,,'LEFT',,.F.,.F.,,,,.F.,))
@@ -78,7 +78,7 @@ User Function consultas()
 RETURN
 
 Static Function insert()
-	Local oJanela  := TDialog():New(0, 0, 730, 1100, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
+	Local oJanela  := TDialog():New(0, 0, 730, 550, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
 	Local aFornecedores := getFornecedores()
 	Local aOrigem := {"1","2"}
 	Local aValores := { ;
@@ -91,7 +91,10 @@ Static Function insert()
 		{'', 'Filial Func.'}, ;
 		{'', 'Matricula do Func.'}, ;
 		{'', 'Origem Exame'}, ;
-		{'', 'Numero do PCMSO'};
+		{'', 'Numero do PCMSO'},;
+		{Date(), 'Data do result. do Exame'},;
+		{'', 'Horário do Exame'},;
+		{'', 'Código do Médico'};
 		}
 
 
@@ -99,21 +102,27 @@ Static Function insert()
 
 	oFichaM		   := TGet():New( 000, 100, {|u|if(PCount()==0,aValores[2][1],aValores[2][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[2][1],,,,,,,aValores[2][2],1,,,,.T.,)
 
-	oCodEx         := TGet():New( 020, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
+	oCodEx         := TGet():New( 030, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
 
-	oData	       := TGet():New( 020, 100, {|u|if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
+	oData	       := TGet():New( 030, 100, {|u|if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
 
-	oFornecedores  := TComboBox():New( 040, 001, {|u|if(PCount()>0,aValores[5][1]:=u,aValores[5][1])}, aFornecedores, 100, , oJanela,,{||alteraLoja(@oFornecedores, @oLoja)},,,,.T.,,,,,,,,, aValores[5][1], aValores[5][2], 1, , )
+	oFornecedores  := TComboBox():New( 060, 001, {|u|if(PCount()>0,aValores[5][1]:=u,aValores[5][1])}, aFornecedores, 100, , oJanela,,{||alteraLoja(@oFornecedores, @oLoja)},,,,.T.,,,,,,,,, aValores[5][1], aValores[5][2], 1, , )
 
-	oLoja	       := TGet():New( 040, 100, {|u|if(PCount()==0, aValores[6][1], aValores[6][1]:=u)}, oJanela, 096, 009, "@N 99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[6][2],1,,,,.T.,)
+	oLoja	       := TGet():New( 060, 100, {|u|if(PCount()==0, aValores[6][1], aValores[6][1]:=u)}, oJanela, 096, 009, "@N 99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[6][2],1,,,,.T.,)
 
-	oFilFun	       := TGet():New( 060, 001, {|u|if(PCount()==0, aValores[7][1], aValores[7][1]:=u)}, oJanela, 096, 009, "@E XX", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[7][2],1,,,,.T.,)
+	oFilFun	       := TGet():New( 090, 001, {|u|if(PCount()==0, aValores[7][1], aValores[7][1]:=u)}, oJanela, 096, 009, "@E XX", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[7][2],1,,,,.T.,)
 
-	oMat           := TGet():New( 060, 100, {|u|if(PCount()==0, aValores[8][1], aValores[8][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[8][2],1,,,,.T.,)
+	oMat           := TGet():New( 090, 100, {|u|if(PCount()==0, aValores[8][1], aValores[8][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[8][2],1,,,,.T.,)
 
-	oOrigem        := TComboBox():New( 080, 001, {|u|if(PCount()>0,aValores[9][1]:=u,aValores[9][1])}, aOrigem, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[9][1], aValores[9][2], 1, , )
+	oOrigem        := TComboBox():New( 120, 001, {|u|if(PCount()>0,aValores[9][1]:=u,aValores[9][1])}, aOrigem, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[9][1], aValores[9][2], 1, , )
 
-	oPcmso         := TGet():New( 080, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
+	oPcmso         := TGet():New( 120, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
+
+	oDataResult    := TGet():New( 150, 100, {|u|if(PCount()==0, aValores[11][1], aValores[11][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[11][2],1,,,,.T.,)
+
+	oHora          := TGet():New( 150, 001, {|u| if(PCount()==0, aValores[12][1], aValores[12][1]:=u)}, oJanela, 096, 009, "@N 99:99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[12][2],1,,,,.T.,)
+
+	oCodMed        := TGet():New( 180, 001, {|u|if(PCount()==0, aValores[13][1], aValores[13][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[13][2],1,,,,.T.,)
 
 	/////////////////////// BOTÃO 'Inserir' ///////////////////////
 
@@ -126,6 +135,14 @@ RETURN
 
 
 Static Function insertDb(aValores, oJanela)
+
+	Local verificaHora := verificarHorario(aValores[12][1], aValores[13][1], aValores[4][1])
+
+	If verificaHora == 0
+		FWAlertError("Medico ja tem consulta neste horario","Erro na inserção")
+		RETURN
+	Endif
+
 	dbSelectArea("TM5")
 	DBGOTOP()
 
@@ -140,6 +157,9 @@ Static Function insertDb(aValores, oJanela)
 	TM5_MAT    := aValores[8][1]
 	TM5_ORIGEX := aValores[9][1]
 	TM5_PCMSO  := aValores[10][1]
+	TM5_DTRESU := aValores[11][1]
+	TM5_HRPROG := aValores[12][1]
+	TM5_USUARI := aValores[13][1]
 
 	MsUnlock()
 
@@ -219,7 +239,7 @@ Static Function updateDb(recno, aValores, oJanela)
 
 	If nErro != 0
 		msgStop("Erro.")
-	Endif	
+	Endif
 
 
 	FWAlertSuccess("Atualizado com sucesso", "Atualizado")
@@ -275,28 +295,29 @@ Static Function view()
 		{TM5->TM5_FILFUN, 'Filial Func.'}, ;
 		{TM5->TM5_MAT, 'Matricula do Func.'}, ;
 		{TM5->TM5_ORIGEX, 'Origem Exame'}, ;
-		{TM5->TM5_PCMSO, 'Numero do PCMSO'} ;
+		{TM5->TM5_PCMSO, 'Numero do PCMSO'}, ;
 		}
 
 	oFilial        := TGet():New( 000, 001, {|u|if(PCount()==0,aValores[1][1],aValores[1][1]:=u)}, oJanela, 096, 009,"@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[1][1],,,,,,,aValores[1][2],1,,,,.T.,)
 
 	oFichaM		   := TGet():New( 000, 100, {|u|if(PCount()==0,aValores[2][1],aValores[2][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[2][1],,,,,,,aValores[2][2],1,,,,.T.,)
 
-	oCodEx         := TGet():New( 020, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
+	oCodEx         := TGet():New( 030, 001, {|u|if(PCount()==0,aValores[3][1],aValores[3][1]:=u)}, oJanela, 096, 009, "@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[3][1],,,,,,,aValores[3][2],1,,,,.T.,)
 
-	oData	       := TGet():New( 020, 100, {|u| if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
+	oData	       := TGet():New( 030, 100, {|u| if(PCount()==0, aValores[4][1], aValores[4][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,.F.,, aValores[4][2],1,,,,.T.,)
 
-	oFornecedores  := TGet():New( 040, 001, {|u|if(PCount()==0,aValores[5][1],aValores[5][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[5][1],,,,,,,aValores[5][2],1,,,,.T.,)
+	oFornecedores  := TGet():New( 060, 001, {|u|if(PCount()==0,aValores[5][1],aValores[5][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[5][1],,,,,,,aValores[5][2],1,,,,.T.,)
 
-	oLoja	       := TGet():New( 040, 100, {|u|if(PCount()==0, aValores[6][1], aValores[6][1]:=u)}, oJanela, 096, 009, "@N 99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[6][2],1,,,,.T.,)
+	oLoja	       := TGet():New( 060, 100, {|u|if(PCount()==0, aValores[6][1], aValores[6][1]:=u)}, oJanela, 096, 009, "@N 99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[6][2],1,,,,.T.,)
 
-	oFilFun	       := TGet():New( 060, 001, {|u|if(PCount()==0, aValores[7][1], aValores[7][1]:=u)}, oJanela, 096, 009, "@E XX", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[7][2],1,,,,.T.,)
+	oFilFun	       := TGet():New( 090, 001, {|u|if(PCount()==0, aValores[7][1], aValores[7][1]:=u)}, oJanela, 096, 009, "@E XX", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[7][2],1,,,,.T.,)
 
-	oMat           := TGet():New( 060, 100, {|u|if(PCount()==0, aValores[8][1], aValores[8][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[8][2],1,,,,.T.,)
+	oMat           := TGet():New( 090, 100, {|u|if(PCount()==0, aValores[8][1], aValores[8][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[8][2],1,,,,.T.,)
 
-	oOrigem        := TGet():New( 080, 001, {|u|if(PCount()==0, aValores[9][1], aValores[9][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[9][2],1,,,,.T.,)
+	oOrigem        := TGet():New( 120, 001, {|u|if(PCount()==0, aValores[9][1], aValores[9][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[9][2],1,,,,.T.,)
 
-	oPcmso         := TGet():New( 080, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
+	oPcmso         := TGet():New( 120, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
+
 
 
 	oButton3      := TButton():Create(oJanela, 340,1,"Fechar",{||oJanela:end()},75,20,,,,.T.,,,,,,)
@@ -367,7 +388,7 @@ RETURN aCodigos
 Static Function selecionaFornecedor(oFornecedores, cCod)
 
 	Local nI
-	Local aFornecedores 
+	Local aFornecedores
 
 	aFornecedores := oFornecedores:aItems
 
@@ -400,3 +421,17 @@ Static Function alteraLoja(oFornecedor, oLoja)
 	oLoja:cText := aLojas[1]
 
 RETURN
+
+Static Function verificarHorario(cHorario, cMedico, cData)
+	Local cQuery
+	Local aConsultas := {}
+
+	cQuery := "SELECT * FROM "+ RetSqlName("TM5") + " WHERE TM5_HRPROG LIKE '"+ cHorario + "' AND TM5_USUARI LIKE '" + cMedico + "' AND TM5_DTPROG LIKE '" + DtoS(cData) + "'" 
+	TCSqlToArr( cQuery, aConsultas, , ,)
+
+	If Len(aConsultas) > 0
+		RETURN 0
+	Else
+		RETURN 1
+	Endif
+RETURN 1
