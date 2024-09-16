@@ -78,8 +78,13 @@ User Function consultas()
 RETURN
 
 Static Function insert()
-	Local oJanela  := TDialog():New(0, 0, 730, 550, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
+	Local oJanela  := TDialog():New(0, 0, 730, 1100, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
 	Local aFornecedores := getFornecedores()
+	Local aExaRef := {"", "1=Referencial","2=Sequencial"}
+	Local aOriaAgr := {"", "1=Ocupacional","2=Não Ocupacional"}
+	Local aIndAgr := {"", "1=Sim", "2=Não"}
+	Local aIndRes := {"", "1=Normal", "2=Alterado"}
+	Local aNatexa := {"", "1=Admissional", "2=Periódico", "3=Mudança função", "4=Retorno ao trabalho", "5=Demissional"}
 	Local aOrigem := {"1","2"}
 	Local aValores := { ;
 		{'', 'Filial'}, ;
@@ -94,7 +99,23 @@ Static Function insert()
 		{'', 'Numero do PCMSO'},;
 		{Date(), 'Data do result. do Exame'},;
 		{'', 'Horário do Exame'},;
-		{'', 'Código do Médico'};
+		{'', 'Código do Médico'},;
+		{'', 'Código de Conclusão'},;
+		{'','Indicador Res. do Exame'},;
+		{'','Indicador Natureza do Exame'},;
+		{'','Observação Sobre Result.'},;
+		{'','Codigo do Centro de Custo'},;
+		{'','Funcao do Funcionario'},;
+		{'','C.B.O.'},;
+		{'','Numero do ASO'},;
+		{'','Codigo do Turno Trabalho'},;
+		{'', 'Detalhes Resultado Exame'},;
+		{'', 'Exame Referencial?'},;
+		{'', 'Agravamento?'},;
+		{'', 'Origem Agravamento'},;
+		{'', 'Log de Inclusao'},;
+		{'', 'Log de Alteracao'},;
+		{'', 'Cod.DENATRAN'};
 		}
 
 
@@ -124,6 +145,38 @@ Static Function insert()
 
 	oCodMed        := TGet():New( 180, 001, {|u|if(PCount()==0, aValores[13][1], aValores[13][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[13][2],1,,,,.T.,)
 
+	oCodRes        := TGet():New( 180, 100, {|u|if(PCount()==0, aValores[14][1], aValores[14][1]:=u)}, oJanela, 096, 009, "@E XXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[14][2],1,,,,.T.,)
+
+	oIndRes		   := TComboBox():New( 210, 001, {|u|if(PCount()>0,aValores[15][1]:=u,aValores[15][1])}, aIndRes, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[15][1], aValores[15][2], 1, , )
+
+	oNatexa        := TComboBox():New( 210, 100, {|u|if(PCount()>0,aValores[16][1]:=u,aValores[16][1])}, aNatexa, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[16][1], aValores[16][2], 1, , )
+
+	oObserv        := TGet():New( 240, 001, {|u|if(PCount()==0, aValores[17][1], aValores[17][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[17][2],1,,,,.T.,)
+
+	oCc            := TGet():New( 240, 100, {|u|if(PCount()==0, aValores[18][1], aValores[18][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[18][2],1,,,,.T.,)
+
+	oCodFun        := TGet():New( 270, 001, {|u|if(PCount()==0, aValores[19][1], aValores[19][1]:=u)}, oJanela, 096, 009, "@E XXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[19][2],1,,,,.T.,)
+
+	oCbo           := TGet():New( 270, 100, {|u|if(PCount()==0, aValores[20][1], aValores[20][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[20][2],1,,,,.T.,)
+
+	oNumAso        := TGet():New( 300, 001, {|u|if(PCount()==0, aValores[21][1], aValores[21][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[21][2],1,,,,.T.,)
+
+	oCodTurno      := TGet():New( 300, 100, {|u|if(PCount()==0, aValores[22][1], aValores[22][1]:=u)}, oJanela, 096, 009, "@E XXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[22][2],1,,,,.T.,)
+
+	oDetResum      := TGet():New( 000, 200, {|u|if(PCount()==0, aValores[23][1], aValores[23][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[23][2],1,,,,.T.,)
+
+	oExaRef        := TComboBox():New( 030, 200, {|u|if(PCount()>0,aValores[24][1]:=u,aValores[24][1])}, aExaRef, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[24][1], aValores[24][2], 1, , )
+
+	oIndaGr		   := TComboBox():New( 060, 200, {|u|if(PCount()>0,aValores[25][1]:=u,aValores[25][1])}, aIndAgr, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[25][1], aValores[25][2], 1, , )
+
+	oOriaAgr       := TComboBox():New( 090, 200, {|u|if(PCount()>0,aValores[26][1]:=u,aValores[26][1])}, aOriaAgr, 100, , oJanela,,,,,,.T.,,,,,,,,, aValores[26][1], aValores[26][2], 1, , )
+
+	oUserGi        := TGet():New( 120, 200, {|u|if(PCount()==0, aValores[27][1], aValores[27][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[27][2],1,,,,.T.,)
+
+	oUserGa        := TGet():New( 150, 200, {|u|if(PCount()==0, aValores[28][1], aValores[28][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[28][2],1,,,,.T.,)
+
+	oCodDena       := TGet():New( 180, 200, {|u|if(PCount()==0, aValores[29][1], aValores[29][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[29][2],1,,,,.T.,)
+
 	/////////////////////// BOTÃO 'Inserir' ///////////////////////
 
 	oButton3      := TButton():Create(oJanela, 340 ,1,"Inserir",{||insertDb(aValores, oJanela)},75,20,,,,.T.,,,,,,)
@@ -137,6 +190,19 @@ RETURN
 Static Function insertDb(aValores, oJanela)
 
 	Local verificaHora := verificarHorario(aValores[12][1], aValores[13][1], aValores[4][1])
+	Local aValoresFaltantes := verificaValores(aValores)
+	Local cValoresTexto := ''
+	Local nI
+
+	If Len(aValoresFaltantes) > 0
+		For nI := 1 To Len(aValoresFaltantes)
+			cValoresTexto += aValoresFaltantes[nI]
+			cValoresTexto += ' '
+			cValoresTexto += Chr(13)+Chr(10)
+		Next
+		FWAlertError("Os seguintes valores não podem estar vazios:" + Chr(13)+Chr(10) + cValoresTexto ,"Erro na inserção")
+		RETURN
+	Endif
 
 	If verificaHora == 0
 		FWAlertError("Medico ja tem consulta neste horario","Erro na inserção")
@@ -160,6 +226,23 @@ Static Function insertDb(aValores, oJanela)
 	TM5_DTRESU := aValores[11][1]
 	TM5_HRPROG := aValores[12][1]
 	TM5_USUARI := aValores[13][1]
+	TM5_CODRES := aValores[14][1]
+	TM5_INDRES := Left(aValores[15][1],1)
+
+	TM5_NATEXA := Left(aValores[16][1],1)
+	TM5_OBSERV := aValores[17][1]
+	TM5_CC     := aValores[18][1]
+	TM5_CODFUN := aValores[19][1]
+	TM5_CBO    := aValores[20][1]
+	TM5_NUMASO := aValores[21][1]
+	TM5_TNOTRA := aValores[22][1]
+	TM5_DESRES := aValores[23][1]
+	TM5_EXAREF := Left(aValores[24][1],1)
+	TM5_INDAGR := Left(aValores[25][1],1)
+	TM5_ORIAGR := Left(aValores[26][1],1)
+	TM5_USERGI := aValores[27][1]
+	TM5_USERGA := aValores[28][1]
+	TM5_CODDET := aValores[29][1]
 
 	MsUnlock()
 
@@ -171,7 +254,7 @@ Static Function insertDb(aValores, oJanela)
 RETURN
 
 Static Function update()
-	Local oJanela  := TDialog():New(0, 0, 730, 1100, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
+	Local oJanela  := TDialog():New(0, 0, 730, 550, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
 	Local aFornecedores := getFornecedores()
 	Local aOrigem := {"1","2"}
 	Local aValores := { ;
@@ -184,7 +267,10 @@ Static Function update()
 		{TM5->TM5_FILFUN, 'Filial Func.'}, ;
 		{TM5->TM5_MAT, 'Matricula do Func.'}, ;
 		{TM5->TM5_ORIGEX, 'Origem Exame'}, ;
-		{TM5->TM5_PCMSO, 'Numero do PCMSO'} ;
+		{TM5->TM5_PCMSO, 'Numero do PCMSO'}, ;
+		{TM5->TM5_DTRESU, 'Data do result. do Exame'},;
+		{TM5->TM5_HRPROG, 'Horário do Exame'},;
+		{TM5->TM5_USUARI, 'Código do Médico'} ;
 		}
 
 
@@ -209,6 +295,11 @@ Static Function update()
 
 	oPcmso         := TGet():New( 080, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
 
+	oDataResult    := TGet():New( 120, 100, {|u|if(PCount()==0, aValores[11][1], aValores[11][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[11][2],1,,,,.T.,)
+
+	oHora          := TGet():New( 120, 001, {|u| if(PCount()==0, aValores[12][1], aValores[12][1]:=u)}, oJanela, 096, 009, "@N 99:99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,.F.,, aValores[12][2],1,,,,.T.,)
+
+	oCodMed        := TGet():New( 150, 001, {|u|if(PCount()==0, aValores[13][1], aValores[13][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,,,,,,,,.T.,,, aValores[13][2],1,,,,.T.,)
 
 	oButton3   := TButton():Create(oJanela,340,1,"Atualizar",{||updateDb(TM5->(RecNo()),aValores, oJanela)},75,20,,,,.T.,,,,,,)
 
@@ -221,6 +312,26 @@ RETURN
 
 Static Function updateDb(recno, aValores, oJanela)
 
+	Local verificaHora := verificarHorario(aValores[12][1], aValores[13][1], aValores[4][1])
+	Local aValoresFaltantes := verificaValores(aValores)
+	Local cValoresTexto := ''
+	Local nI
+
+	If Len(aValoresFaltantes) > 0
+		For nI := 1 To Len(aValoresFaltantes)
+			cValoresTexto += aValoresFaltantes[nI]
+			cValoresTexto += ' '
+			cValoresTexto += Chr(13)+Chr(10)
+		Next
+		FWAlertError("Os valores não podem estar vazios:" + Chr(13)+Chr(10) + cValoresTexto ,"Erro na inserção")
+		RETURN
+	Endif
+
+	If verificaHora == 0
+		FWAlertError("Medico ja tem consulta neste horario","Erro na atualização")
+		RETURN
+	Endif
+
 	cQryUpd := "UPDATE " + RetSqlName("TM5") + " "
 	cQryUpd += "SET tm5_filial = '" + aValores[1][1] + "', "
 	cQryUpd += "tm5_numfic = '" + aValores[2][1] + "', "
@@ -231,7 +342,10 @@ Static Function updateDb(recno, aValores, oJanela)
 	cQryUpd += "TM5_FILFUN = '" + aValores[7][1] + "', "
 	cQryUpd += "TM5_MAT = '" + aValores[8][1] + "', "
 	cQryUpd += "TM5_ORIGEX = '" + aValores[9][1] + "', "
-	cQryUpd += "TM5_PCMSO = '" + aValores[10][1] + "' "
+	cQryUpd += "TM5_PCMSO = '" + aValores[10][1] + "', "
+	cQryUpd += "TM5_DTRESU = '" + DtoS(aValores[11][1]) + "', "
+	cQryUpd += "TM5_HRPROG = '" + aValores[12][1] + "', "
+	cQryUpd += "TM5_USUARI = '" + aValores[13][1] + "' "
 	cQryUpd += "WHERE R_E_C_N_O_ = '" + cValToChar(recno) + "' "
 	cQryUpd += "AND D_E_L_E_T_ = ' '"
 
@@ -284,7 +398,7 @@ Static Function deleteDb(recno, oJanela)
 RETURN
 
 Static Function view()
-	Local oJanela  := TDialog():New(0, 0, 730, 1100, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
+	Local oJanela  := TDialog():New(0, 0, 730, 550, 'Cadastro de consultas', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
 	Local aValores := { ;
 		{TM5->TM5_FILIAL, 'Filial'}, ;
 		{TM5->TM5_NUMFIC, 'Ficha Médica'}, ;
@@ -296,6 +410,9 @@ Static Function view()
 		{TM5->TM5_MAT, 'Matricula do Func.'}, ;
 		{TM5->TM5_ORIGEX, 'Origem Exame'}, ;
 		{TM5->TM5_PCMSO, 'Numero do PCMSO'}, ;
+		{TM5->TM5_DTRESU, 'Data do result. do Exame'},;
+		{TM5->TM5_HRPROG, 'Horário do Exame'},;
+		{TM5->TM5_USUARI, 'Código do Médico'} ;
 		}
 
 	oFilial        := TGet():New( 000, 001, {|u|if(PCount()==0,aValores[1][1],aValores[1][1]:=u)}, oJanela, 096, 009,"@N 999999999",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,, aValores[1][1],,,,,,,aValores[1][2],1,,,,.T.,)
@@ -318,6 +435,11 @@ Static Function view()
 
 	oPcmso         := TGet():New( 120, 100, {|u|if(PCount()==0, aValores[10][1], aValores[10][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXXXXXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[10][2],1,,,,.T.,)
 
+	oDataResult    := TGet():New( 150, 100, {|u| if(PCount()==0, aValores[11][1], aValores[11][1]:=u)}, oJanela, 096, 009, "@D", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,.F.,, aValores[11][2],1,,,,.T.,)
+
+	oHora          := TGet():New( 150, 001, {|u| if(PCount()==0, aValores[12][1], aValores[12][1]:=u)}, oJanela, 096, 009, "@N 99:99", ,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,.F.,, aValores[12][2],1,,,,.T.,)
+
+	oCodMed        := TGet():New( 180, 001, {|u|if(PCount()==0, aValores[13][1], aValores[13][1]:=u)}, oJanela, 096, 009, "@E XXXXXXXXXXXX",,0,,,,, .T. /*[ lPixel ]*/,,,,,,,.T.,,,,,,,.T.,,, aValores[13][2],1,,,,.T.,)
 
 
 	oButton3      := TButton():Create(oJanela, 340,1,"Fechar",{||oJanela:end()},75,20,,,,.T.,,,,,,)
@@ -426,7 +548,7 @@ Static Function verificarHorario(cHorario, cMedico, cData)
 	Local cQuery
 	Local aConsultas := {}
 
-	cQuery := "SELECT * FROM "+ RetSqlName("TM5") + " WHERE TM5_HRPROG LIKE '"+ cHorario + "' AND TM5_USUARI LIKE '" + cMedico + "' AND TM5_DTPROG LIKE '" + DtoS(cData) + "'" 
+	cQuery := "SELECT * FROM "+ RetSqlName("TM5") + " WHERE TM5_HRPROG LIKE '"+ cHorario + "' AND TM5_USUARI LIKE '" + cMedico + "' AND TM5_DTPROG LIKE '" + DtoS(cData) + "'"
 	TCSqlToArr( cQuery, aConsultas, , ,)
 
 	If Len(aConsultas) > 0
@@ -435,3 +557,19 @@ Static Function verificarHorario(cHorario, cMedico, cData)
 		RETURN 1
 	Endif
 RETURN 1
+
+Static Function verificaValores(aValores)
+	Local aNomeValores := {}
+	Local nI
+
+	For nI := 1 to 3
+		valor := aValores[nI][1]
+		nome := aValores[nI][2]
+
+		If valor == ''
+			AADD(aNomeValores,nome)
+		Endif
+	Next
+
+
+RETURN aNomeValores
